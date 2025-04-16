@@ -20,7 +20,6 @@ public class MoverByPoints : MonoBehaviour
         if ((transform.position - _nextPoint.position).sqrMagnitude < MinDistant)
         {
             _numberNextPoint = ++_numberNextPoint % _points.Length;
-
             transform.forward = _points[_numberNextPoint].transform.position - transform.position;
         }
     }

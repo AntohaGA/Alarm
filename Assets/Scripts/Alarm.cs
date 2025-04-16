@@ -46,18 +46,16 @@ public class Alarm : MonoBehaviour
 
     private IEnumerator ChangeVolume(float targetVolume)
     {
+        _isVolumeChanges = true;
+
         if (targetVolume > 0)
         {
             _alarmSound.Play();
         }
 
-        _isVolumeChanges = true;
-
         while (_alarmSound.volume != targetVolume)
         {
             _alarmSound.volume = Mathf.MoveTowards(_alarmSound.volume, targetVolume, SpeedVolumeChange * Time.deltaTime);
-
-            Debug.Log($"{_alarmSound.volume}");
 
             yield return null;
         }

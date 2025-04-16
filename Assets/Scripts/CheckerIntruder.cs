@@ -11,12 +11,6 @@ public class CheckerIntruder : MonoBehaviour
         if (other.TryGetComponent(out Burglar _))
         {
             BurglarDetected?.Invoke();
-            Debug.Log("Burglar on");
-        }
-
-        else
-        {
-            Debug.Log("Someone else on");
         }
     }
 
@@ -25,11 +19,6 @@ public class CheckerIntruder : MonoBehaviour
         if (other.TryGetComponent(out Burglar _))
         {
             BurglarGone?.Invoke();
-            Debug.Log("Burglar gone");
-        }
-        else
-        {
-            Debug.Log("Someone else off");
         }
     }
 }
