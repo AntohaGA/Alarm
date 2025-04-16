@@ -5,65 +5,68 @@ using UnityEngine;
 public class Alarm : MonoBehaviour
 {
     private const float SpeedVolumeChange = 0.2f;
+    private const float MaxVolume = 1.0f;
+    private const float MinVolume = 0.0f;
+
+    private bool _isVolumeChanges;
 
     private AudioSource _alarmSound;
 
-    private string _target = "Burglar";
-
-    private IEnumerator _VolumeUpCoroutine;
-    private IEnumerator _VolumeDownCoroutine;
+    private IEnumerator _changeVolumeUpCoroutine;
+    private IEnumerator _changeVolumeDownCoroutine;
 
     private void Awake()
     {
-        _VolumeUpCoroutine = ChangeVolumeUp();
-        _VolumeDownCoroutine = ChangeVolumeDown();
+        _isVolumeChanges = false;
         _alarmSound = GetComponent<AudioSource>();
         _alarmSound.volume = 0;
-        _alarmSound.Play();
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void On()
     {
-        if (IsTargets(other))
+        if (_isVolumeChanges)
         {
-            StopCoroutine(_VolumeDownCoroutine);
-            _VolumeUpCoroutine = ChangeVolumeUp();
-            StartCoroutine(_VolumeUpCoroutine);
+            StopCoroutine(_changeVolumeDownCoroutine);
         }
+
+        _changeVolumeUpCoroutine = ChangeVolume(MaxVolume);
+        StartCoroutine(_changeVolumeUpCoroutine);
     }
 
-    private void OnTriggerExit(Collider other)
+    public void Off()
     {
-        if (IsTargets(other))
+        if (_isVolumeChanges)
         {
-            StopCoroutine(_VolumeUpCoroutine);
-            _VolumeDownCoroutine = ChangeVolumeDown();
-            StartCoroutine(_VolumeDownCoroutine);
+            StopCoroutine(_changeVolumeUpCoroutine);
         }
+
+        _changeVolumeDownCoroutine = ChangeVolume(MinVolume);
+        StartCoroutine(_changeVolumeDownCoroutine);
     }
 
-    private bool IsTargets(Collider target)
+    private IEnumerator ChangeVolume(float targetVolume)
     {
-        return target.CompareTag(_target);
-    }
-
-    private IEnumerator ChangeVolumeUp()
-    {
-        while (_alarmSound.volume != 1)
+        if (targetVolume > 0)
         {
-            _alarmSound.volume = Mathf.MoveTowards(_alarmSound.volume, 1, SpeedVolumeChange * Time.deltaTime);
+            _alarmSound.Play();
+        }
+
+        _isVolumeChanges = true;
+
+        while (_alarmSound.volume != targetVolume)
+        {
+            _alarmSound.volume = Mathf.MoveTowards(_alarmSound.volume, targetVolume, SpeedVolumeChange * Time.deltaTime);
+
+            Debug.Log($"{_alarmSound.volume}");
 
             yield return null;
         }
-    }
 
-    private IEnumerator ChangeVolumeDown()
-    {
-        while (_alarmSound.volume != 0)
+        _isVolumeChanges = false;
+
+        if (_alarmSound.volume == 0)
         {
-            _alarmSound.volume = Mathf.MoveTowards(_alarmSound.volume, 0, SpeedVolumeChange * Time.deltaTime);
-
-            yield return null;
+            _alarmSound.Stop();
         }
     }
 }
